@@ -5,6 +5,7 @@ void setUp(void){}    //not need
 void tearDown(void){} //not need
 
 void test_HashDeterministic(void);
+void test_Vectors(void);
 
 int main(void)
 {
