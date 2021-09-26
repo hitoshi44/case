@@ -1,2 +1,2 @@
 # case
-Fixed size, Lightweight, hash table written in C with No heap allocation on runtime.
+Fixed size, Lightweight, hash table written in C with No runtime heap allocation.
