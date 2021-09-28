@@ -1,8 +1,17 @@
 /*
-  struct tHeader pretends a index to actual K-V data.
+  struct ctHeader behaves like a index for the table.
 
-  
-  When you would like "get" by Key, CaseTable does below:
+
+  Why headers like this are needed?
+
+  Header is needed to decrease hash-collision probability with 
+  less size of heap.
+  Because Case(this module) is using open-addressing, reserving larger space 
+  than actually required is important.
+  So, Case allocates extra heap with unit of <ctHeader = int> size, 
+  instead of K-V data size.
+
+  When you would like "get" by Key, Case does below:
   
       Hashed = hash(Key)
       Header = Header_Array[ Hashed ]
@@ -13,14 +22,7 @@
       ELSE
         ITERATE (Header.index) to DO-SAME
 
-  It means, a Key chains to (Key -> Hash -> Header -> K-V-Data).
-
-
-  Header is needed to decrease hash-collision probability with less memory.
-  Because Case is using open-addressing, reserving larger space 
-  than actually required is important.
-  So, Case allocates extra memory space with unit of <ctHeader = int> size, 
-  instead of K-V data size.
+  Thus, a Key chains like (Key -> Hash -> Header -> K-V-Data).
 */
 
 typedef int ctHeader;
