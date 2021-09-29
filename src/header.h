@@ -27,4 +27,5 @@
 
 typedef int ctHeader;
 
-int initHeader(ctHeader **, int);
+int initHeader(ctHeader **, 
+               int        /*Max item(k-v pair) counts of a table*/);

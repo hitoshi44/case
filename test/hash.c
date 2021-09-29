@@ -16,17 +16,25 @@ int main(void)
 
 void test_HashDeterministic(void)
 {
-  char ascii[64]    = "abcdXYZ@01230123()";
-  char nonascii[64] = "カラビ・ヤウ多様体🐶";
+  // No meaning. A Random modulo for hash.
   int modulo = 3141592653;
 
-  unsigned int prehash;
+  unsigned int hash_1;
+  unsigned int hash_2;
 
-  prehash = hash(ascii, modulo);
-  TEST_ASSERT_EQUAL_UINT(prehash, hash(ascii, modulo));
 
-  prehash = hash(nonascii, modulo);
-  TEST_ASSERT_EQUAL_UINT(prehash, hash(nonascii, modulo));  
+  // Same inputs must be return same value.
+  hash_1 = hash("abcdXYZ@01230123()", modulo);
+  hash_2 = hash("abcdXYZ@01230123()", modulo);
+  TEST_ASSERT_EQUAL_UINT(hash_1,hash_2);
 
-  TEST_ASSERT_NOT_EQUAL_UINT(hash("Hash diff: A", modulo), hash("Hash diff: B", modulo));
+  hash_1 = hash("カラビ・ヤウ多様体🐶", modulo);
+  hash_2 = hash("カラビ・ヤウ多様体🐶", modulo);
+  TEST_ASSERT_EQUAL_UINT(hash_1,hash_2);
+
+
+  // Different inputs should return differents.
+  hash_1 = hash("abcdXYZ@01230123()",   modulo);
+  hash_2 = hash("カラビ・ヤウ多様体🐶", modulo);
+  TEST_ASSERT_NOT_EQUAL_UINT(hash_1, hash_2);
 }

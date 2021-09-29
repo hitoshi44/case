@@ -1,12 +1,13 @@
 #include "unity/unity.h"
 #include "../src/body.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 void setUp(){}
 void tearDown(){}
 
-void test_InitBody(void);
+void test_CreateBody(void);
 void test_Standard_Set_Get_Body(void);
 void test_Exceed_Size_Set_Body(void);
 
@@ -14,18 +15,18 @@ int main(void)
 {
   UNITY_BEGIN();
 
-  RUN_TEST(test_InitBody);
+  RUN_TEST(test_CreateBody);
   RUN_TEST(test_Standard_Set_Get_Body);
   RUN_TEST(test_Exceed_Size_Set_Body);
 
   return UNITY_END();
 }
 
-void test_InitBody(void)
+void test_CreateBody(void)
 {
   ctBody b;
 
-  b = initBody(32, 64);
+  b = createBody(32, 64);
 
   TEST_ASSERT_EQUAL_INT(32, b.data_size);
   TEST_ASSERT_EQUAL_INT(64,  b.data_count);
@@ -42,7 +43,7 @@ void test_InitBody(void)
 void test_Standard_Set_Get_Body(void)
 {
   ctBody b;
-  b = initBody(32, 64);  
+  b = createBody(32, 64);  
 
   // set
   char key[16];
@@ -82,7 +83,7 @@ void test_Standard_Set_Get_Body(void)
 void test_Exceed_Size_Set_Body(void)
 {
   ctBody b;
-  b = initBody(8, 128);
+  b = createBody(8, 128);
 
   char key[4] = "key";
   char val[4] = "val";

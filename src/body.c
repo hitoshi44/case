@@ -8,14 +8,16 @@ static void lockbit(unsigned char*, int);
 static void unlockbit(unsigned char*, int);
 static void initBits(unsigned char*, int);
 
-ctBody initBody(int size, int count)
+ctBody createBody(int size, int count)
   { // Assumed count is a multiple of sizeof(int)*8.
     ctBody result;
     result.data_count = count;
     result.data_size  = size;
     result.ctData     = (char *)malloc(count * size);
     result.bits       = (unsigned char *)malloc(count/8);
+    
     initBits(result.bits, count/8);
+    
     return result;
   }
 // ctBody methods.
@@ -46,36 +48,50 @@ void delData(ctBody* b, int index)
   #define MASK_6  0x20
   #define MASK_7  0x40
   #define MASK_8  0x80
-static int  book(ctBody *b)
-  { // Search available index and book, return the index.
-    // If there is no space, return -1
+static int book(ctBody *b)
+  { // Search an index of available memory and do book, return the index.
+    // If there is no available space, return -1.    
     int result = -1;
-    int limit = (b->data_count - 1)/(sizeof(int)*8) + 1;
-    int *bigs = (int *)(b->bits); // Iterate with bigger size over bits.
     int i;
-    for (i=0; i<limit; i++) {
-    if( bigs[i] != 0 ) {
+
+
+    // First, do a loop over whole bits with bigger block size (sizeof(int)).
+    int loop_limit   = (b->data_count - 1)/(sizeof(int)*8) + 1;
+    int *bits_as_int = (int *)(b->bits); 
+
+    for ( i=0; i<loop_limit; i++) {
+      if( bits_as_int[i] != 0 ) { // Search for a block containing 1 bit in it.
       
-      limit = i*sizeof(int) + 8;
-      for(i=(limit-8); i<limit ; i++) {
-      if( (b->bits)[i] > 0 ){
-        if ( ((b->bits)[i] & MASK_1) != 0 ) {result=i*8;  break;}
-        if ( ((b->bits)[i] & MASK_2) != 0 ) {result=i*8+1;break;}
-        if ( ((b->bits)[i] & MASK_3) != 0 ) {result=i*8+2;break;}
-        if ( ((b->bits)[i] & MASK_4) != 0 ) {result=i*8+3;break;}
-        if ( ((b->bits)[i] & MASK_5) != 0 ) {result=i*8+4;break;}
-        if ( ((b->bits)[i] & MASK_6) != 0 ) {result=i*8+5;break;}
-        if ( ((b->bits)[i] & MASK_7) != 0 ) {result=i*8+6;break;}
-        if ( ((b->bits)[i] & MASK_8) != 0 ) {result=i*8+7;break;}
-      }}
+    
+        //Second, do a loop over the block with smaller, a byte size.
+        i = i *  sizeof(int); // To use "index" on char[], change the i scale.
+        loop_limit = i + (sizeof(int)/sizeof(char));
+        
+        for(; i<loop_limit ; i++) {
+          if( (b->bits)[i] > 0 ){ // Search for a byte containing 1 bit in it.
+            // Last, specify which bit is 1.
+            if ( ((b->bits)[i] & MASK_1) != 0 ) {result=i*8;  break;}
+            if ( ((b->bits)[i] & MASK_2) != 0 ) {result=i*8+1;break;}
+            if ( ((b->bits)[i] & MASK_3) != 0 ) {result=i*8+2;break;}
+            if ( ((b->bits)[i] & MASK_4) != 0 ) {result=i*8+3;break;}
+            if ( ((b->bits)[i] & MASK_5) != 0 ) {result=i*8+4;break;}
+            if ( ((b->bits)[i] & MASK_6) != 0 ) {result=i*8+5;break;}
+            if ( ((b->bits)[i] & MASK_7) != 0 ) {result=i*8+6;break;}
+            if ( ((b->bits)[i] & MASK_8) != 0 ) {result=i*8+7;break;}
+        }}
 
-    }if(result > -1)break;}
 
-    lockbit(b->bits, result);
+      }
+      // If result is updated, lock the bit and escape from whole loop.
+      if(result > -1){lockbit(b->bits, result);break;}
+    }
+
+    // If no bit flag was searched, result is stil -1.
     return result;
   }
 static void lockbit(unsigned char bits[], int target)
   { // Make target index "unavailable". (set bit flag to 0)
+    // If -1 is passed, do nothing.
   if(target > -1){
     int chunk = (target / 8);
     switch(target % 8){
@@ -90,6 +106,7 @@ static void lockbit(unsigned char bits[], int target)
   }}}
 static void unlockbit(unsigned char bits[], int target)
   { // Make target index "available" again. (set bit flag to 1)
+    // If -1 is passed, do nothing.
   if(target > -1){
     int chunk = target / 8;
     switch(target % 8){

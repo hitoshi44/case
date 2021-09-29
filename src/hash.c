@@ -1,5 +1,7 @@
 #include "hash.h"
 
+// TODO: Change to more fast Hash Function? e.g) xxxHash, FarmHash
+
 /* 
     Implementation Fowler-Noll-Vo(1a) hash under Public Domain.
 */
