@@ -1,3 +1,11 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include "hash.h"
+#include "header.h"
+#include "body.h"
+
 typedef struct CaseTable CaseTable;
 struct CaseTable {   
   ctHeader *header;
@@ -20,7 +28,7 @@ CaseTable createCaseTable(int /*key size (bytes)*/,
                           int /*value size (bytes)*/,
                           int /*items counts*/);
 
-int ctAdd(CaseTable *t, char key[], char value[]);
+int ctPut(CaseTable *t, char key[], char value[]);
 int ctFet(CaseTable *t, char key[]);
 int ctHas(CaseTable *t, char key[]);
 int ctDel(CaseTable *t, char key[]);

@@ -47,7 +47,7 @@ void test_InitTable(void)
     case 16: heap_volume = (144 + 16) * 32 + (32/8);break;
     default: heap_volume = -1;// Unknown.
   }
-  TEST_ASSERT_EQUAL_INT(heap_volume, table.total_heap);
+  TEST_ASSERT_EQUAL_INT(heap_volume, table.total_allocated_heap);
 
   // Free the memory allocated.
   // For ordinary use case, this is not necessary.
@@ -63,7 +63,7 @@ void test_InitTable(void)
     case 16: heap_volume = (256 + 16) * 512 + (512/8);break;
     default: heap_volume = -1;// Unknown.
   }
-  TEST_ASSERT_EQUAL_INT(heap_volume, table.total_heap);  
+  TEST_ASSERT_EQUAL_INT(heap_volume, table.total_allocated_heap);  
 
   ctFree(&table);
 }
@@ -76,11 +76,11 @@ void test_Add_and_Fetch(void)
   // Add and Fetch string literal.
   // Fetch retrieve the pointer to the value.
 
-  TEST_ASSERT_EQUAL_INT( 0, ctAdd(t, "key", "value"));
+  TEST_ASSERT_EQUAL_INT( 0, ctPut(t, "key", "value"));
   TEST_ASSERT_EQUAL_INT( 0, ctFetch(t, "key"));
   TEST_ASSERT_EQUAL_STRING("value", t->value); 
 
-  TEST_ASSERT_EQUAL_INT( 0, ctAdd(t, "key2", "value2"));
+  TEST_ASSERT_EQUAL_INT( 0, ctPut(t, "key2", "value2"));
   TEST_ASSERT_EQUAL_INT( 0, ctFetch(t, "key2"));
   TEST_ASSERT_EQUAL_STRING("value2", t->value);
 
@@ -103,8 +103,8 @@ void test_Add_and_Has(void)
   table = createCaseTable(32, 32, 64);
   t = &table;
 
-  ctAdd(t, "key:1", "value:1");
-  ctAdd(t, "key:2", "value:2");
+  ctPut(t, "key:1", "value:1");
+  ctPut(t, "key:2", "value:2");
 
   // Exist
   TEST_ASSERT_EQUAL_INT( 1, ctHas(t, "key:1"));
@@ -122,14 +122,14 @@ void test_Del_and_Pop(void)
   t = &table;
 
   // Test Del
-  ctAdd(t, "test_delete", "");
+  ctPut(t, "test_delete", "");
   TEST_ASSERT_EQUAL_INT( 1, ctHas(t, "test_delete"));
   ctDel(t, "test_delete");
   TEST_ASSERT_EQUAL_INT( 0, ctHas(t, "test_delete"));
 
   // Test Pop
   // Pop return int but NOT string, it just fetch and delete.
-  ctAdd(t, "test_pop", "");
+  ctPut(t, "test_pop", "");
   TEST_ASSERT_EQUAL_INT( 1, ctHas(t, "test_pop")); // Has
   TEST_ASSERT_EQUAL_INT( 1, ctPop(t, "test_pop")); // Pop
   // After Pop.
@@ -152,14 +152,14 @@ void test_OverAdding(void)
   for(i=0; i<64; i++)
   {
     sprintf(key, "key<%d>", i);
-    ctAdd(t, key, "");
+    ctPut(t, key, "");
   }
 
   // Exceed Adding.
   for( ; i<100; i++)
   {
     sprintf(key, "key<%d>", i);
-    TEST_ASSERT_EQUAL_INT(-1, ctAdd(t, key, ""));
+    TEST_ASSERT_EQUAL_INT(-1, ctPut(t, key, ""));
   }
 
 

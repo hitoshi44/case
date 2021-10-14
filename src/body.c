@@ -38,6 +38,13 @@ void delData(ctBody* b, int index)
   {
     unlockbit(b->bits, index);
   }
+void overWriteData(ctBody* b, int index,
+                   char key[], int ksize,
+                   char val[], int vsize)
+  {
+    strncpy( &((b->ctData)[ index * b->data_size        ]), key, ksize);
+    strncpy( &((b->ctData)[ index * b->data_size + ksize]), val, vsize);
+  }
 
 // Bit Flags Functions.
   #define MASK_1  0x01
