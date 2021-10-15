@@ -2,6 +2,7 @@
 
 static int calculateDataSize(int, int); // Calculate heap size for ctData
 static int calculateCapacity(int); // Calculate heap size for actual capacity.
+static void clean_DEL_flags_into_EMPTY(CaseTable *t, unsigned int start_pos);
 
 CaseTable createCaseTable(int key_size,
                           int value_size,
@@ -76,6 +77,32 @@ int ctHas(CaseTable *t, char key[])
   return -1;
 }
 
+// Return 0 when deleted, -1 when key not found.
+int ctDel(CaseTable *t, char key[])
+{ // Almost same for ctHas, except for deepest if-stmt.
+  unsigned int hashed = hash(key, t->hash_mod);
+  char *target;
+  int header = (t->header)[hashed];
+
+  while( (t->header)[hashed] > CT_IS_DEL_FULL ) {
+    if (header > CT_IS_FULL) {
+      target = getData(&(t->body), header);
+      if (strncmp(key, target, t->key_size) == 0){
+        // Deletes
+        (t->count)--; (t->header)[hashed] = CT_DEL;
+        delData(&(t->body), header);
+        // Clean flags if possible.
+        clean_DEL_flags_into_EMPTY(t, hashed);
+        return 0;
+      }
+    }
+    hashed = (hashed + 1) % t->hash_mod;
+    header = (t->header)[hashed];
+  }
+
+  return -1;
+}
+
 // Helpers.
 void ctFree(CaseTable *t)
 { // Free all alloced heap.
@@ -93,7 +120,27 @@ int calculateDataSize(int ksize, int vsize) {
 int calculateCapacity(int required) {
   return ((required - 1)/sizeof(int) + 1)*sizeof(int);
 }
+void clean_DEL_flags_into_EMPTY(CaseTable *t, unsigned int start_pos) {
+  int current_pos = start_pos + 1;
+  // while current header is DEL or EMPTY.
+  while ((t->header)[current_pos] < 0) {
 
+    // If there is EMPTY after continous DELs,
+    // then that DELs are all EMPTY.
+    if ((t->header)[current_pos] == CT_EMPTY){
+      while (start_pos < current_pos) {
+        (t->header)[start_pos] = CT_EMPTY;
+        start_pos++;
+
+      }
+      return;
+    }
+
+    current_pos = (current_pos + 1) % t->hash_mod;
+  }
+
+  // When FULL header found, do nothing.
+}
 
 int main(void)
 {
@@ -101,16 +148,29 @@ int main(void)
   table = createCaseTable(8,16,32);
   t = &table;
 
-  printf("Just after inited. count:%d\n", t->count);
+  printf("Just after inited.\n  count:%d\n", t->count);
 
   printf("%d\n",ctPut(t, "key","value"));
   printf("%d\n",ctPut(t, "key2","value2"));
+  printf("%d\n",ctPut(t, "key1","value11"));
+  printf("%d\n",ctPut(t, "key12","value12"));
 
-  printf("After put 2 items. count:%d\n", t->count);
+  printf("After put 4 items.\n  count:%d\n", t->count);
 
   printf("%d\n",ctPut(t, "key","value new."));  
 
-  printf("Over put imtes.    count:%d\n", t->count);
+  printf("Over put imtes.\n  count:%d\n", t->count);
 
+  printf("%d\n",ctDel(t, "key"));
+  printf("%d\n",ctDel(t, "key2"));
+
+  printf("After deleted 2 items.\n  count:%d\n", t->count);
+
+  printf("Does table Has that items?\n");
+  printf("  ctHas -> %d\n", ctHas(t, "key"));
+  printf("  ctHas -> %d\n", ctHas(t, "key2"));
+  printf("Does table Has Not deleted items?\n");
+  printf("  ctHas -> %d\n", ctHas(t, "key1"));
+  printf("  ctHas -> %d\n", ctHas(t, "key12"));
   ctFree(t);
 }
