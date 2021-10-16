@@ -56,14 +56,35 @@ int ctPut(CaseTable *t, char key[], char value[])
   return 0;
 }
 
-// If key exists, return the index, else, return -1.
+// Fetch pointers for key and value, if NOT exist return -1.
+int ctFet(CaseTable *t, char key[])
+{
+  unsigned int hashed = hash(key, t->hash_mod);
+  int header = (t->header)[hashed];
+
+  while( header > CT_IS_DEL_FULL ) {
+    if ( header > CT_IS_FULL ) {
+      t->key = getData(&(t->body), header);
+      if (strncmp(key, t->key, t->key_size) == 0){
+        (t->value) = (t->key + t->key_size);
+        return 0;
+      }
+    }
+    hashed = (hashed + 1) % t->hash_mod;
+    header = (t->header)[hashed];
+  }
+
+  return -1;  
+}
+
+// If key exists, return the header(index for Table.body), else, return -1.
 int ctHas(CaseTable *t, char key[])
 {
   unsigned int hashed = hash(key, t->hash_mod);
   char *target;
   int header = (t->header)[hashed];
 
-  while( (t->header)[hashed] > CT_IS_DEL_FULL ) {
+  while( header > CT_IS_DEL_FULL ) {
     if (header > CT_IS_FULL) {
       target = getData(&(t->body), header);
       if (strncmp(key, target, t->key_size) == 0){
@@ -84,7 +105,7 @@ int ctDel(CaseTable *t, char key[])
   char *target;
   int header = (t->header)[hashed];
 
-  while( (t->header)[hashed] > CT_IS_DEL_FULL ) {
+  while( header > CT_IS_DEL_FULL ) {
     if (header > CT_IS_FULL) {
       target = getData(&(t->body), header);
       if (strncmp(key, target, t->key_size) == 0){
@@ -172,5 +193,19 @@ int main(void)
   printf("Does table Has Not deleted items?\n");
   printf("  ctHas -> %d\n", ctHas(t, "key1"));
   printf("  ctHas -> %d\n", ctHas(t, "key12"));
+  
+  printf(" \n");
+  ctFet(t, "key1");
+  printf("Fet key1 \n  %s\n  %s\n", t->key, t->value);
+  ctFet(t, "key12");
+  printf("Fet key1 \n  %s\n  %s\n", t->key, t->value);
+
+  // TODO: KeyVal must be terminated by \0, for ease use.
+  //       Init cyBody with extra 1 byte size for each keys and values?
+  printf("=== Over Sized KV!! ===\n");
+  ctPut(t, "123456789", "=10bytes==1234567");
+  ctFet(t, "123456789");
+  printf("Fet Over Sized\n  key: %s\n  val: %s\n", t->key, t->value);  
+
   ctFree(t);
 }
