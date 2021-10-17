@@ -14,11 +14,11 @@ CaseTable createCaseTable(int key_size,
   int data_block_size = calculateDataSize(key_size, value_size);
 
   // Set props.
-  table.count    = 0;
-  table.capacity = max_item_cap;
-  table.hash_mod = table.capacity * 8;
-  table.key_size = key_size;
-  table.val_size = value_size;
+  table.count     = 0;
+  table.capacity  = max_item_cap;
+  table.hash_mod  = table.capacity * 8;
+  table.key_size  = key_size;
+  table.val_size  = value_size;
   table.data_size = data_block_size;
 
   // Alloc header.
@@ -66,7 +66,7 @@ int ctFet(CaseTable *t, char key[])
     if ( header > CT_IS_FULL ) {
       t->key = getData(&(t->body), header);
       if (strncmp(key, t->key, t->key_size) == 0){
-        (t->value) = (t->key + t->key_size);
+        (t->value) = (t->key + t->key_size+1);
         return 0;
       }
     }
@@ -135,7 +135,8 @@ void ctFree(CaseTable *t)
 
 int calculateDataSize(int ksize, int vsize) {
   // Make a multiple of 4 bytes where larger than (ksize + vsize + 2).
-  int sum = ksize + vsize;
+  // Allocate one more byte for each to make null terminated.
+  int sum = ksize + 1 + vsize + 1;
   return ((sum + 2 - 1)/4 + 1) * 4;
 }
 int calculateCapacity(int required) {
