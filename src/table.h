@@ -32,8 +32,7 @@ int ctPut(CaseTable *t, char key[], char value[]);
 int ctFet(CaseTable *t, char key[]);
 int ctHas(CaseTable *t, char key[]);
 int ctDel(CaseTable *t, char key[]);
+int ctPop(CaseTable *t, char key[]);
 
 // Helper
-char* ctGet(CaseTable *t, char key[]);
-char* ctPop(CaseTable *t, char key[]);
 void  ctFree(CaseTable *t);

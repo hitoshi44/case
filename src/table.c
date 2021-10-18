@@ -77,7 +77,7 @@ int ctFet(CaseTable *t, char key[])
   return -1;  
 }
 
-// If key exists, return the header(index for Table.body), else, return -1.
+// If key exists, return the header > 0(index for Table.body), else, return -1.
 int ctHas(CaseTable *t, char key[])
 {
   unsigned int hashed = hash(key, t->hash_mod);
@@ -124,6 +124,33 @@ int ctDel(CaseTable *t, char key[])
   return -1;
 }
 
+// Fetch and delete it at the same time.
+int ctPop(CaseTable *t, char key[])
+{ 
+  unsigned int hashed = hash(key, t->hash_mod);
+  int header = (t->header)[hashed];
+
+  while( header > CT_IS_DEL_FULL ) {
+    if ( header > CT_IS_FULL ) {
+      t->key = getData(&(t->body), header);
+      if (strncmp(key, t->key, t->key_size) == 0){
+        // Fetch
+        (t->value) = (t->key + t->key_size+1);
+        // Delete
+        (t->count)--; (t->header)[hashed] = CT_DEL;
+        delData(&(t->body), header);
+        clean_DEL_flags_into_EMPTY(t, hashed);
+
+        return 0;
+      }
+    }
+    hashed = (hashed + 1) % t->hash_mod;
+    header = (t->header)[hashed];
+  }
+
+  return -1;
+}
+
 // Helpers.
 void ctFree(CaseTable *t)
 { // Free all alloced heap.
@@ -131,8 +158,6 @@ void ctFree(CaseTable *t)
   free(t->body.ctData);
   free(t->header);
 }
-
-
 int calculateDataSize(int ksize, int vsize) {
   // Make a multiple of 4 bytes where larger than (ksize + vsize + 2).
   // Allocate one more byte for each to make null terminated.
@@ -162,51 +187,4 @@ void clean_DEL_flags_into_EMPTY(CaseTable *t, unsigned int start_pos) {
   }
 
   // When FULL header found, do nothing.
-}
-
-int main(void)
-{
-  CaseTable table, *t;
-  table = createCaseTable(8,16,32);
-  t = &table;
-
-  printf("Just after inited.\n  count:%d\n", t->count);
-
-  printf("%d\n",ctPut(t, "key","value"));
-  printf("%d\n",ctPut(t, "key2","value2"));
-  printf("%d\n",ctPut(t, "key1","value11"));
-  printf("%d\n",ctPut(t, "key12","value12"));
-
-  printf("After put 4 items.\n  count:%d\n", t->count);
-
-  printf("%d\n",ctPut(t, "key","value new."));  
-
-  printf("Over put imtes.\n  count:%d\n", t->count);
-
-  printf("%d\n",ctDel(t, "key"));
-  printf("%d\n",ctDel(t, "key2"));
-
-  printf("After deleted 2 items.\n  count:%d\n", t->count);
-
-  printf("Does table Has that items?\n");
-  printf("  ctHas -> %d\n", ctHas(t, "key"));
-  printf("  ctHas -> %d\n", ctHas(t, "key2"));
-  printf("Does table Has Not deleted items?\n");
-  printf("  ctHas -> %d\n", ctHas(t, "key1"));
-  printf("  ctHas -> %d\n", ctHas(t, "key12"));
-  
-  printf(" \n");
-  ctFet(t, "key1");
-  printf("Fet key1 \n  %s\n  %s\n", t->key, t->value);
-  ctFet(t, "key12");
-  printf("Fet key1 \n  %s\n  %s\n", t->key, t->value);
-
-  // TODO: KeyVal must be terminated by \0, for ease use.
-  //       Init cyBody with extra 1 byte size for each keys and values?
-  printf("=== Over Sized KV!! ===\n");
-  ctPut(t, "123456789", "=10bytes==1234567");
-  ctFet(t, "123456789");
-  printf("Fet Over Sized\n  key: %s\n  val: %s\n", t->key, t->value);  
-
-  ctFree(t);
 }

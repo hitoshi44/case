@@ -38,4 +38,6 @@ test/header.o:
 test/body.o:
 	@$(CC) $(CFLAGS) $(UNT) src/body.c test/body.c -o test/body.o
 test/table.o:
-	@$(CC) $(CFLAGS) $(UNT) src/table.c test/table.c -o test/table.o
+	@$(CC) $(CFLAGS) $(UNT)  src/table.c \
+				 src/body.c src/header.c src/hash.c \
+				 test/table.c -o test/table.o
