@@ -24,21 +24,28 @@ struct ctBody {
 };
 
 // Methods
-ctBody createBody(int/* bytes of sum(Key+Value)*/,
-                  int/* max counts of KV pairs */);
+ctBody createBody(int bytes_of_KV_Data,
+                  int capacity_of_data_count);
 
 // Get a pointer to the data on the heap.
 char* getData(ctBody*,
-              int     /* index*/);
+              int index);
 
 // Set Key, Value on a heap
-// Return the index of the heap.
-int   setData(ctBody*,
-              char* /*key[]        */,
-              int   /*bytes of key */,
-              char* /*value[]      */,
-              int   /*bytes of val */);    
+// Return the index of the data.
+int setData(ctBody*,
+            char* key,
+            int   bytes_of_key,
+            char* value,
+            int   bytes_of_value);    
 
 // Delete by index. Actually, it just let bitflag be 1.
-void  delData(ctBody*,
-              int    /*index*/);
+void delData(ctBody*,
+             int index);
+
+void overWriteData(ctBody*,
+                   int index,
+                   char* key,
+                   int   bytes_of_key,
+                   char* value,
+                   int   bytes_of_value);

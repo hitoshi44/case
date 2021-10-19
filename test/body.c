@@ -64,18 +64,12 @@ void test_Standard_Set_Get_Body(void)
   TEST_ASSERT_EQUAL_CHAR('y', result[2]);
   TEST_ASSERT_EQUAL_CHAR(':', result[3]);
   TEST_ASSERT_EQUAL_CHAR('4', result[4]);
-  TEST_ASSERT_EQUAL_CHAR('v', result[16]);
-  TEST_ASSERT_EQUAL_CHAR('a', result[17]);
-  TEST_ASSERT_EQUAL_CHAR('l', result[18]);
-  TEST_ASSERT_EQUAL_CHAR('u', result[19]);
-  TEST_ASSERT_EQUAL_CHAR('e', result[20]);
-  TEST_ASSERT_EQUAL_CHAR(':', result[21]);
-  TEST_ASSERT_EQUAL_CHAR('1', result[22]);
-  TEST_ASSERT_EQUAL_CHAR('0', result[23]);
-  TEST_ASSERT_EQUAL_CHAR('2', result[24]);
-  TEST_ASSERT_EQUAL_CHAR('4', result[25]);
+  TEST_ASSERT_EQUAL_CHAR('v', result[17]);
+  TEST_ASSERT_EQUAL_CHAR('a', result[18]);
+  TEST_ASSERT_EQUAL_CHAR('l', result[19]);
+  TEST_ASSERT_EQUAL_CHAR('4', result[26]);
 
-  TEST_ASSERT_EQUAL_HEX8(0x00,result[26]);
+  TEST_ASSERT_EQUAL_HEX8(0x00,result[27]);
 
   free(b.ctData);
   free(b.bits);

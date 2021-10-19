@@ -31,10 +31,10 @@ void test_InitHeader(void)
   expected_bytes = Heap_Size_From(16);
   actual_bytes   = initHeader(&headers, 16);
   TEST_ASSERT_EQUAL_INT(expected_bytes, actual_bytes);
-  TEST_ASSERT_EQUAL_INT(-1, headers[0]); // First
-  TEST_ASSERT_EQUAL_INT(-1, headers[7]);
-  TEST_ASSERT_EQUAL_INT(-1, headers[8]);
-  TEST_ASSERT_EQUAL_INT(-1, headers[15]);// Last
+  TEST_ASSERT_EQUAL_INT(CT_EMPTY, headers[0]); // First
+  TEST_ASSERT_EQUAL_INT(CT_EMPTY, headers[7]);
+  TEST_ASSERT_EQUAL_INT(CT_EMPTY, headers[8]);
+  TEST_ASSERT_EQUAL_INT(CT_EMPTY, headers[15]);// Last
 
   free(headers);
 
@@ -43,10 +43,10 @@ void test_InitHeader(void)
   expected_bytes = Heap_Size_From(128);
   actual_bytes   = initHeader(&headers, 128);
   TEST_ASSERT_EQUAL_INT(expected_bytes, actual_bytes);
-  TEST_ASSERT_EQUAL_INT(-1, headers[0]);  // First
-  TEST_ASSERT_EQUAL_INT(-1, headers[63]);
-  TEST_ASSERT_EQUAL_INT(-1, headers[64]);
-  TEST_ASSERT_EQUAL_INT(-1, headers[127]);// Last
+  TEST_ASSERT_EQUAL_INT(CT_EMPTY, headers[0]);  // First
+  TEST_ASSERT_EQUAL_INT(CT_EMPTY, headers[63]);
+  TEST_ASSERT_EQUAL_INT(CT_EMPTY, headers[64]);
+  TEST_ASSERT_EQUAL_INT(CT_EMPTY, headers[127]);// Last
 
   free(headers);  
 }

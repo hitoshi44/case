@@ -9,7 +9,7 @@ static void unlockbit(unsigned char*, int);
 static void initBits(unsigned char*, int);
 
 ctBody createBody(int size, int count)
-  { // Assumed count is a multiple of sizeof(int)*8.
+  { // Assumed count is a multiple of 8.
     ctBody result;
     result.data_count = count;
     result.data_size  = size;
@@ -29,14 +29,21 @@ int setData(ctBody* b, char key[], int ksize, char value[], int vsize)
   {
     int index = book(b);
     if (index > -1) {
-      strncpy( &((b->ctData)[ index * b->data_size        ]),   key, ksize);
-      strncpy( &((b->ctData)[ index * b->data_size + ksize]), value, vsize);
+      strncpy( &((b->ctData)[ index * b->data_size          ]),   key, ksize);
+      strncpy( &((b->ctData)[ index * b->data_size + ksize+1]), value, vsize);
     }
     return index;
   }
 void delData(ctBody* b, int index)
   {
     unlockbit(b->bits, index);
+  }
+void overWriteData(ctBody* b, int index,
+                   char key[], int ksize,
+                   char val[], int vsize)
+  {
+    strncpy( &((b->ctData)[ index * b->data_size          ]), key, ksize);
+    strncpy( &((b->ctData)[ index * b->data_size + ksize+1]), val, vsize);
   }
 
 // Bit Flags Functions.

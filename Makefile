@@ -4,7 +4,8 @@ CFLAGS	= -g -Wall
 TOBJS	= \
 	test/hash.o \
 	test/header.o \
-	test/body.o
+	test/body.o \
+	test/table.o
 
 UNT	= test/unity/unity.c
 
@@ -27,6 +28,8 @@ test:	$(TOBJS)
 	@./test/header.o
 	@echo "\\n\n===[ test Body ]===="
 	@./test/body.o
+	@echo "\\n\n===[ test Table(Application) ]===="
+	@./test/table.o
 
 test/hash.o:
 	@$(CC) $(CFLAGS) $(UNT) src/hash.c test/hash.c -o test/hash.o
@@ -34,3 +37,7 @@ test/header.o:
 	@$(CC) $(CFLAGS) $(UNT) src/header.c test/header.c -o test/header.o
 test/body.o:
 	@$(CC) $(CFLAGS) $(UNT) src/body.c test/body.c -o test/body.o
+test/table.o:
+	@$(CC) $(CFLAGS) $(UNT)  src/table.c \
+				 src/body.c src/header.c src/hash.c \
+				 test/table.c -o test/table.o

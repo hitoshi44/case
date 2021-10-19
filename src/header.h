@@ -27,5 +27,11 @@
 
 typedef int ctHeader;
 
+// empty < deleted < full...
+#define CT_EMPTY -4       // "header==EMPTY" means that header is emtpy.
+#define CT_DEL   -2       // "header==DEL"   means that header is deleted.
+#define CT_IS_DEL_FULL -3 // "header>IS_DEL_FULL" means header is deleted or full.
+#define CT_IS_FULL -1     // "header>IS_FULL"means that header is full.
+
 int initHeader(ctHeader **, 
-               int        /*Max item(k-v pair) counts of a table*/);
+               int table_capacity);
