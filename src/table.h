@@ -1,3 +1,6 @@
+#ifndef CASETABLE_NOREALLOC_H
+#define CASETABLE_NOREALLOC_H
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -36,3 +39,5 @@ int ctPop(CaseTable *t, char key[]);
 
 // Helper
 void  ctFree(CaseTable *t);
+
+#endif
