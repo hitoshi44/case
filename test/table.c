@@ -25,28 +25,32 @@ int main(void)
   return UNITY_END();
 }
 
+// Capacity is multiple of sizeof(int), Size(bytes) is multiple of 4.
+int calcCap(int req) {return ((req - 1)/sizeof(int) + 1)*sizeof(int);}
+int calcSize(int req){return ((req + 2 - 1)/4 + 1) * 4; }
 void test_InitTable(void)
 {
   CaseTable table, *t;
-
+  int heap_volume;
+  int cap, size;
 
   // Create Table with info of
   // Key_Size, Value_Size, Item_Counts
-  table = createCaseTable(32, 100, 20);
-  
   // Allocated heap volume is calculated as below:
   // ( (sizeof(KV Data)+sizeof(int)) * Item_Counts) + sizeof(BitFlags)
   // 
   // sizeof(KV Data) and Item_Counts are multiples of sizeof(int)
   // Sizeof BitFlags, which is tiny bits array for searching "empty" space for data,
   // is (Item_Counts)/8.
-  int heap_volume;
-  switch(sizeof(int)){
-    case 4: heap_volume = (160 + 32) * 32 + (32/8);break;
-    case 8: heap_volume = (192 + 64) * 64 + (64/8);break;
-    case 2: heap_volume = (144 + 16) * 32 + (32/8);break;
-    default: heap_volume = -1;// Unknown.
-  }
+  table = createCaseTable(32, 100, 20);
+  cap = calcCap(20);
+  size= calcSize(132);
+  
+  TEST_ASSERT_EQUAL_INT(cap,  table.capacity);
+  TEST_ASSERT_EQUAL_INT(size, table.data_size);
+
+  // HeaderVolume + BodyDataVolume + Body-bit-flagsVolume
+  heap_volume = sizeof(int)*cap*8 + size*cap + ( cap/8 + 1 );
   TEST_ASSERT_EQUAL_INT(heap_volume, table.total_allocated_heap);
 
   // Free the memory allocated.
@@ -57,12 +61,13 @@ void test_InitTable(void)
   // Do the same with another Init param.
   // CaseTable allow valuesize:0, this leads key only table.
   table = createCaseTable(253, 0, 500);
-  switch(sizeof(int)){
-    case 32: heap_volume = (256 + 32) * 512 + (512/8);break;
-    case 64: heap_volume = (256 + 64) * 512 + (512/8);break;
-    case 16: heap_volume = (256 + 16) * 512 + (512/8);break;
-    default: heap_volume = -1;// Unknown.
-  }
+  cap = calcCap(500);
+  size= calcSize(253);
+
+  TEST_ASSERT_EQUAL_INT(cap,  table.capacity);
+  TEST_ASSERT_EQUAL_INT(size, table.data_size);
+
+  heap_volume = sizeof(int)*cap*8 + size*cap + ( cap/8 + 1);
   TEST_ASSERT_EQUAL_INT(heap_volume, table.total_allocated_heap);  
 
   ctFree(&table);

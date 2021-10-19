@@ -30,7 +30,8 @@ CaseTable createCaseTable(int key_size,
 
   // Set allocated heap size and return.
   table.total_allocated_heap = header_size + 
-                               (table.body.data_size * table.body.data_count);
+                               (table.body.data_size * table.body.data_count) +
+                               (table.capacity)/8 + 1 /*Body bit flags size*/;
   return table; 
 }
 
@@ -162,7 +163,7 @@ int calculateDataSize(int ksize, int vsize) {
   // Make a multiple of 4 bytes where larger than (ksize + vsize + 2).
   // Allocate one more byte for each to make null terminated.
   int sum = ksize + 1 + vsize + 1;
-  return ((sum + 2 - 1)/4 + 1) * 4;
+  return ((sum - 1)/4 + 1) * 4;
 }
 int calculateCapacity(int required) {
   return ((required - 1)/sizeof(int) + 1)*sizeof(int);

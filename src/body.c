@@ -9,7 +9,7 @@ static void unlockbit(unsigned char*, int);
 static void initBits(unsigned char*, int);
 
 ctBody createBody(int size, int count)
-  { // Assumed count is a multiple of sizeof(int)*8.
+  { // Assumed count is a multiple of 8.
     ctBody result;
     result.data_count = count;
     result.data_size  = size;
